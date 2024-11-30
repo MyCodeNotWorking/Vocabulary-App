@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Globale Stildefinitionen */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background: linear-gradient(to right, #89c3eb, #ff7eb9); /* Hintergrund mit Verlauf von hellblau zu pink */
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            color: white;
+            font-size: 2em;
+            margin: 0;
+        }
+
+        /* Stile für die Vokabelliste */
+        .vocab-container {
+            margin: 20px auto; /* Abstand oben und unten */
+            width: 80%; /* Anpassen der Breite der Tabelle nach Bedarf */
+            position: relative;
+        }
+
+        .vocab-list {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .vocab-list caption {
+            font-size: 1.2em; /* Größere Schriftgröße für den Tabellennamen */
+            margin-bottom: 10px; /* Abstand zwischen Tabellennamen und Tabelle */
+            text-align: center;
+        }
+
+        .vocab-list th, .vocab-list td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .vocab-list th {
+            background-color: #f2f2f2;
+        }
+
+        /* Stile für den Button */
+        .create-button {
+            display: block;
+            margin: 20px auto; /* Abstand oben und unten */
+            padding: 10px 20px;
+            background-color: #007bff; /* Blaue Farbe für den Button */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Stile für die Pfeilschaltflächen */
+        .nav-buttons {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-buttons button {
+            background-color: transparent;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+        }
+
+        /* Stile für den Vokabel-Hinzufügen-Button */
+        .add-vocab-button {
+            margin-top: 10px; /* Abstand über dem Button */
+            display: block;
+            margin: 20px auto; /* Abstand oben und unten */
+            padding: 10px 20px;
+            background-color: #28a745; /* Grüne Farbe für den Button */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Stile für den Bearbeiten- und Löschen-Button */
+        .edit-delete-buttons button {
+            background-color: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            margin-right: 5px; /* Abstand zwischen den Buttons */
+        }
+
+        /* Stile für den "Liste löschen" Button */
+        .delete-list-button {
+            margin-top: 10px; /* Abstand über dem Button */
+            display: block;
+            margin: 20px auto; /* Abstand oben und unten */
+            padding: 10px 20px;
+            background-color: #dc3545; /* Rote Farbe für den Button */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Stile für den "Spielen!" Button */
+        .play-button {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: block;
+            padding: 20px 40px; /* Anpassen der Größe des Buttons nach Bedarf */
+            background-color: #ff5722; /* Farbe für den Button */
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5em; /* Schriftgröße des Buttons */
+            border-radius: 10px; /* Runde Ecken */
+        }
+
+        /* Stile für das Spiel */
+        .game-container {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .answer-input {
+            font-size: 1.2em;
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .check-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        /* Stile für die Export- und Import-Buttons */
+.export-import-buttons {
+    text-align: center;
+    margin: 20px 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(50%, 0);
+}
+
+.export-list-button,
+.import-list-button {
+    display: block;
+    margin: 5px auto;
+    padding: 3px 8px; /* Kleinerer padding-Wert für kleinere Buttons */
+    background-color: #ff5722; /* Orange Farbe für die Buttons */
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8em; /* Kleinere Schriftgröße für die Buttons */
+    border-radius: 5px; /* Runde Ecken */
+}
+
+
+
+    </style>
+    <title>Vocab-App!</title>
+</head>
+<body>
+    <header>
+        <h1>Vocab-App!</h1>
+    </header>
+    <main class="vocab-container">
+        <div class="nav-buttons">
+            <button id="prevList" onclick="prevList()">&#8592;</button>
+            <button id="nextList" onclick="nextList()">&#8594;</button>
+        </div>
+
+        <!-- Hier füge die Buttons für Export und Import hinzu -->
+        <div class="export-import-buttons">
+            <button class="export-list-button" onclick="exportList()">Liste exportieren</button>
+            <button class="import-list-button" onclick="importList()">Liste importieren</button>
+        </div>
+      
+        <table class="vocab-list">
+            <caption id="listName">Vokabelliste 1</caption>
+            <thead>
+                <tr>
+                    <th>Deutsch</th>
+                    <th>Französisch</th>
+                    <th>Aktionen</th> <!-- Hinzufügen von Aktionsspalte -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Hier kannst du die Vokabeln eintragen -->
+                <tr>
+                    <td>Guten Morgen</td>
+                    <td>Bonjour</td>
+                    <td>
+                        <div class="edit-delete-buttons">
+                            <button onclick="editVocabulary(0)">Bearbeiten</button>
+                            <button onclick="deleteVocabulary(0)">Löschen</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Danke</td>
+                    <td>Merci</td>
+                    <td>
+                        <div class="edit-delete-buttons">
+                            <button onclick="editVocabulary(1)">Bearbeiten</button>
+                            <button onclick="deleteVocabulary(1)">Löschen</button>
+                        </div>
+                    </td>
+                </tr>
+                <!-- Weitere Vokabeln hier einfügen -->
+            </tbody>
+        </table>
+        <button class="add-vocab-button" onclick="addVocabulary()">Vokabel hinzufügen</button>
+        <button class="delete-list-button" onclick="deleteList()" id="deleteListButton" disabled>Liste löschen</button>
+        <button class="create-button" onclick="createNewList()">Neue Vokabelliste erstellen</button>
+      
+    </main>
+    <button class="play-button" onclick="startGame()">Spielen!</button>
+
+    <!-- Spielbereich -->
+    <div class="game-container">
+        <div id="progress">Frage <span id="questionNumber">0</span> von <span id="totalQuestions">0</span></div>
+
+        <div class="question" id="question"></div>
+        <input type="text" class="answer-input" id="answerInput" placeholder="Antwort eingeben">
+        <button class="check-button" onclick="checkAnswer()">Überprüfen</button>
+    </div>
+
+    <script>
+        function exportList() {
+        var listToExport = vocabLists[currentListIndex];
+        var exportData = JSON.stringify(listToExport);
+
+        var blob = new Blob([exportData], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = listToExport.name + ".json";
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importList() {
+        var input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+
+        input.onchange = function (event) {
+            var file = event.target.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                var importedData = e.target.result;
+                try {
+                    var importedList = JSON.parse(importedData);
+                    vocabLists.push(importedList);
+                    currentListIndex = vocabLists.length - 1;
+                    displayList();
+                    alert("Die Vokabelliste '" + importedList.name + "' wurde importiert.");
+                    document.getElementById("deleteListButton").disabled = false;
+                    saveVocabLists(); // Speichere die aktualisierte Liste in localStorage
+                } catch (error) {
+                    alert("Fehler beim Importieren der Vokabelliste.");
+                }
+            };
+
+            reader.readAsText(file);
+        };
+
+        input.click();
+    }
+      
+        // Speichern der Vokabellisten in localStorage
+        function saveVocabLists() {
+          localStorage.setItem('vocabLists', JSON.stringify(vocabLists));
+        }
+
+        // Funktion zum Laden der Vokabellisten aus localStorage beim Initialisieren der App
+        function loadVocabLists() {
+          var storedLists = localStorage.getItem('vocabLists');
+          if (storedLists) {
+            vocabLists = JSON.parse(storedLists);
+          }
+        }
+      
+      
+        var currentListIndex = 0;
+        var vocabLists = [
+            { name: "Vokabelliste 1", deutsch: [], franzoesisch: [] }
+        ];
+        loadVocabLists(); //change 4 this project is finished
+
+        function prevList() {
+            if (currentListIndex > 0) {
+                currentListIndex--;
+                displayList();
+            }
+        }
+
+        function nextList() {
+            if (currentListIndex < vocabLists.length - 1) {
+                currentListIndex++;
+                displayList();
+            }
+        }
+
+        function createNewList() {
+            var listName = prompt("Geben Sie den Namen der neuen Vokabelliste ein:");
+            if (listName) {
+                vocabLists.push({ name: listName, deutsch: [], franzoesisch: [] });
+                currentListIndex = vocabLists.length - 1;
+                displayList();
+                alert("Die neue Vokabelliste '" + listName + "' wurde erstellt.");
+                document.getElementById("deleteListButton").disabled = false; // Aktiviere den "Liste löschen" Button
+            }
+            saveVocabLists(); // Speichere die aktualisierte Liste in localStorage
+        }
+
+        function addVocabulary() {
+            var deutschVocab = prompt("Geben Sie die deutsche Vokabel ein:");
+            if (deutschVocab) {
+                var franzoesischVocab = prompt("Geben Sie die französische Vokabel ein:");
+                if (franzoesischVocab) {
+                    var list = vocabLists[currentListIndex];
+                    list.deutsch.push(deutschVocab);
+                    list.franzoesisch.push(franzoesischVocab);
+                    displayList();
+                    alert("Die Vokabeln wurden zur Liste hinzugefügt.");
+                }
+            }
+            saveVocabLists(); // Speichere die aktualisierte Liste in localStorage
+        }
+
+        function editVocabulary(index) {
+            var list = vocabLists[currentListIndex];
+            var deutschVocab = prompt("Bearbeiten Sie die deutsche Vokabel:", list.deutsch[index]);
+            if (deutschVocab) {
+                var franzoesischVocab = prompt("Bearbeiten Sie die französische Vokabel:", list.franzoesisch[index]);
+                if (franzoesischVocab) {
+                    list.deutsch[index] = deutschVocab;
+                    list.franzoesisch[index] = franzoesischVocab;
+                    displayList();
+                    alert("Die Vokabel wurde bearbeitet.");
+                }
+            }
+            saveVocabLists(); // Speichere die aktualisierte Liste in localStorage
+        }
+
+        function deleteVocabulary(index) {
+            var list = vocabLists[currentListIndex];
+            if (confirm("Möchten Sie diese Vokabel löschen?\n\nDeutsch: " + list.deutsch[index] + "\nFranzösisch: " + list.franzoesisch[index])) {
+                list.deutsch.splice(index, 1);
+                list.franzoesisch.splice(index, 1);
+                displayList();
+                alert("Die Vokabel wurde gelöscht.");
+            }
+            saveVocabLists(); // Speichere die aktualisierte Liste in localStorage
+        }
+
+        function deleteList() {
+            if (vocabLists.length > 1) {
+                if (confirm("Möchten Sie diese Vokabelliste löschen?\n\n" + vocabLists[currentListIndex].name)) {
+                    vocabLists.splice(currentListIndex, 1);
+                    if (currentListIndex >= vocabLists.length) {
+                        currentListIndex = vocabLists.length - 1;
+                    }
+                    displayList();
+                    alert("Die Vokabelliste wurde gelöscht.");
+                }
+            } else {
+                alert("Es muss mindestens eine Vokabelliste vorhanden sein und kann nicht gelöscht werden.");
+            }
+            saveVocabLists(); // Speichere die aktualisierte Liste in localStorage
+        }
+
+      //###############################################################################################################################
+
+        var gameInProgress = false;
+        var currentQuestionIndex = 0;
+        var currentVocabList = [];
+
+        var totalQuestions = 0;
+
+function startGame() {
+    if (vocabLists.length === 0) {
+        alert("Erstellen Sie zuerst eine Vokabelliste, um zu spielen.");
+        return;
+    }
+
+    currentVocabList = vocabLists[currentListIndex].deutsch.slice();
+    currentVocabListF = vocabLists[currentListIndex].franzoesisch.slice();
+    shuffleArray(currentVocabList);
+    currentQuestionIndex = 0;
+    gameInProgress = true;
+    totalQuestions = currentVocabList.length; // Setze die Gesamtzahl der Fragen
+    displayNextQuestion();
+}
+
+function displayNextQuestion() {
+    if (currentQuestionIndex < currentVocabList.length) {
+        var question = currentVocabList[currentQuestionIndex];
+        document.getElementById("question").textContent = question;
+        document.getElementById("answerInput").value = "";
+        document.querySelector(".game-container").style.display = "block";
+        document.querySelector(".vocab-container").style.display = "none";
+
+        // Aktualisiere den Fortschritt
+        document.getElementById("questionNumber").textContent = currentQuestionIndex + 1;
+        document.getElementById("totalQuestions").textContent = totalQuestions;
+    } else {
+        endGame();
+    }
+}
+
+
+        function checkAnswer() {
+            if (!gameInProgress) return;
+
+            var userAnswer = document.getElementById("answerInput").value.trim();
+            var correctAnswer = currentVocabListF[currentQuestionIndex]; //change 2
+
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                currentQuestionIndex++;
+                displayNextQuestion();
+            } else {
+                var errorMessage = userAnswer + " ist falsch.\nRichtig wäre: " + correctAnswer;
+                alert(errorMessage);
+            }
+        }
+
+      //###############################################################################################################################
+
+        function endGame() {
+            gameInProgress = false;
+            alert("Spiel beendet. Sie haben alle Vokabeln abgefragt.");
+            document.querySelector(".game-container").style.display = "none";
+            document.querySelector(".vocab-container").style.display = "block";
+        }
+
+        // Funktion zum Zufälliges Mischen eines Arrays (Fisher-Yates Algorithmus)
+        function shuffleArray(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+                [currentVocabListF[i], currentVocabListF[j]] = [currentVocabListF[j], currentVocabListF[i]] //change 3 and last change
+            }
+        }
+
+        function displayList() {
+            var list = vocabLists[currentListIndex];
+            document.getElementById("listName").textContent = list.name;
+
+            var table = document.querySelector(".vocab-list tbody");
+            table.innerHTML = "";
+
+            for (var i = 0; i < list.deutsch.length; i++) {
+                var newRow = table.insertRow();
+                var deutschCell = newRow.insertCell(0);
+                var franzoesischCell = newRow.insertCell(1);
+                var actionsCell = newRow.insertCell(2);
+
+                deutschCell.textContent = list.deutsch[i];
+                franzoesischCell.textContent = list.franzoesisch[i];
+
+                var editDeleteButtons = document.createElement("div");
+                editDeleteButtons.className = "edit-delete-buttons";
+                var editButton = document.createElement("button");
+                editButton.textContent = "Bearbeiten";
+                editButton.onclick = (function (index) {
+                    return function () {
+                        editVocabulary(index);
+                    };
+                })(i);
+                var deleteButton = document.createElement("button");
+                deleteButton.textContent = "Löschen";
+                deleteButton.onclick = (function (index) {
+                    return function () {
+                        deleteVocabulary(index);
+                    };
+                })(i);
+
+                editDeleteButtons.appendChild(editButton);
+                editDeleteButtons.appendChild(deleteButton);
+                actionsCell.appendChild(editDeleteButtons);
+            }
+
+            // Deaktiviere den "Liste löschen" Button, wenn nur eine Liste vorhanden ist
+            if (vocabLists.length === 1) {
+                document.getElementById("deleteListButton").disabled = true;
+            }
+        }
+
+        displayList();
+    </script>
+</body>
+</html>
